@@ -2,7 +2,7 @@ import Badge from '../ui/Badge'
 import { STAGES } from '../kanban/stages'
 
 const STAGE_TONE = {
-  new: 'info',
+  applied: 'info',
   screening: 'warning',
   interview: 'accent',
   offer: 'success',

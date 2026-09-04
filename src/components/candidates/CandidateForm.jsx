@@ -7,7 +7,7 @@ export default function CandidateForm({ jobs, initial, onSubmit, onCancel }) {
   const [phone, setPhone] = useState(initial?.phone ?? '')
   const [linkedinUrl, setLinkedinUrl] = useState(initial?.linkedin_url ?? '')
   const [jobId, setJobId] = useState(initial?.job_id ?? jobs[0]?.id ?? '')
-  const [stage, setStage] = useState(initial?.stage ?? 'new')
+  const [stage, setStage] = useState(initial?.stage ?? STAGES[0].key)
   const [notes, setNotes] = useState(initial?.notes ?? '')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')

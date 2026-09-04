@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../supabase'
+import { normalizeStage } from '../components/kanban/stages'
 
 // The `candidates` table (pre-existing, defined outside this app) uses
 // `full_name` and `status` as its column names. The rest of the app works
@@ -9,7 +10,7 @@ import { supabase } from '../supabase'
 function fromRow(row) {
   if (!row) return row
   const { full_name, status, ...rest } = row
-  return { ...rest, name: full_name, stage: status }
+  return { ...rest, name: full_name, stage: normalizeStage(status) }
 }
 
 function toRow(candidate) {
