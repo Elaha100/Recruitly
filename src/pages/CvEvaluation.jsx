@@ -51,7 +51,7 @@ export default function CvEvaluation() {
   const [cvText, setCvText] = useState('')
   const [result, setResult] = useState(null)
 
-  const selectedCandidate = candidates.find((c) => c.id === candidateId)
+  const selectedCandidate = candidates.find((c) => String(c.id) === candidateId)
   const linkedJob = useMemo(
     () => jobs.find((j) => j.id === selectedCandidate?.job_id),
     [jobs, selectedCandidate]
@@ -59,9 +59,19 @@ export default function CvEvaluation() {
 
   const handleEvaluate = (e) => {
     e.preventDefault()
-    const text = cvText.trim() || selectedCandidate?.notes || ''
-    const jobDescription = linkedJob?.description || ''
-    setResult(runHeuristicEvaluation(text, jobDescription))
+
+    if (!linkedJob) {
+      setResult({ status: 'no-job' })
+      return
+    }
+
+    const text = cvText.trim() || selectedCandidate?.notes?.trim() || ''
+    if (!text) {
+      setResult({ status: 'no-text' })
+      return
+    }
+
+    setResult({ status: 'ok', ...runHeuristicEvaluation(text, linkedJob.description || '') })
   }
 
   return (
@@ -151,46 +161,66 @@ export default function CvEvaluation() {
         <>
           <h2 className="result-section-title">Evaluation result</h2>
           <p className="field-hint" style={{ marginBottom: 16 }}>
-            {selectedCandidate?.name} vs. {linkedJob?.title ?? 'no linked job'}
+            {selectedCandidate?.name} vs. {linkedJob ? linkedJob.title : 'no linked job'}
           </p>
 
-          <div className="result-grid">
-            <div className="result-card">
-              <div className="result-card-label">Match Score</div>
-              <div className="result-score-value">{result.score}/100</div>
+          {result.status === 'no-job' && (
+            <div className="card">
+              <p className="field-hint">
+                This candidate isn't linked to a job, so there's nothing to compare the CV
+                against. Link this candidate to a job before running an evaluation.
+              </p>
             </div>
+          )}
 
-            <div className="result-card">
-              <div className="result-card-label">Recommendation</div>
-              <p className="result-recommendation">{result.recommendation}</p>
+          {result.status === 'no-text' && (
+            <div className="card">
+              <p className="field-hint">
+                No CV text was provided and this candidate has no notes to fall back on. Paste
+                CV text above, or add notes to the candidate, then try again.
+              </p>
             </div>
+          )}
 
-            <div className="result-card">
-              <div className="result-card-label">Strengths</div>
-              {result.strengths.length ? (
-                <ul className="result-list">
-                  {result.strengths.map((s) => (
-                    <li key={s}>{s}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="field-hint">No strong keyword overlap detected.</p>
-              )}
-            </div>
+          {result.status === 'ok' && (
+            <div className="result-grid">
+              <div className="result-card">
+                <div className="result-card-label">Match Score</div>
+                <div className="result-score-value">{result.score}/100</div>
+              </div>
 
-            <div className="result-card">
-              <div className="result-card-label">Potential Gaps</div>
-              {result.gaps.length ? (
-                <ul className="result-list">
-                  {result.gaps.map((g) => (
-                    <li key={g}>{g}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="field-hint">No obvious gaps detected.</p>
-              )}
+              <div className="result-card">
+                <div className="result-card-label">Recommendation</div>
+                <p className="result-recommendation">{result.recommendation}</p>
+              </div>
+
+              <div className="result-card">
+                <div className="result-card-label">Strengths</div>
+                {result.strengths.length ? (
+                  <ul className="result-list">
+                    {result.strengths.map((s) => (
+                      <li key={s}>{s}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="field-hint">No strong keyword overlap detected.</p>
+                )}
+              </div>
+
+              <div className="result-card">
+                <div className="result-card-label">Potential Gaps</div>
+                {result.gaps.length ? (
+                  <ul className="result-list">
+                    {result.gaps.map((g) => (
+                      <li key={g}>{g}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="field-hint">No obvious gaps detected.</p>
+                )}
+              </div>
             </div>
-          </div>
+          )}
         </>
       )}
 
