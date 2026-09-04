@@ -147,6 +147,7 @@
 
 .app-content {
   flex: 1;
+  min-width: 0;
   padding: 36px 40px;
   max-width: 1360px;
   width: 100%;
