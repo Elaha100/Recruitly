@@ -343,6 +343,15 @@
 }
 
 
+/* Text under sign in-knappen om att admin skapar konton */
+.no-account-note {
+  margin: 18px 0 0;
+  text-align: center;
+  font-size: 13px;
+  color: #69758a;
+}
+
+
 /* Sign in-knappen */
 .sign-in-button {
   width: 100%;
